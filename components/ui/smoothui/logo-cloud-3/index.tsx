@@ -1,16 +1,6 @@
 "use client";
 
 import type React from "react";
-import {
-  Canpoy,
-  Canva,
-  Casetext,
-  Clearbit,
-  Descript,
-  Duolingo,
-  Faire,
-  Strava,
-} from "../shared";
 
 export interface LogoMarqueeProps {
   title?: string;
@@ -24,17 +14,6 @@ export interface LogoMarqueeProps {
   pauseOnHover?: boolean;
 }
 
-const DEFAULT_LOGOS = [
-  { name: "Canpoy", logo: <Canpoy /> },
-  { name: "Canva", logo: <Canva /> },
-  { name: "Casetext", logo: <Casetext /> },
-  { name: "Strava", logo: <Strava /> },
-  { name: "Descript", logo: <Descript /> },
-  { name: "Duolingo", logo: <Duolingo /> },
-  { name: "Faire", logo: <Faire /> },
-  { name: "Clearbit", logo: <Clearbit /> },
-];
-
 const SPEED_MAP = {
   slow: "60s",
   normal: "40s",
@@ -44,7 +23,7 @@ const SPEED_MAP = {
 export function LogoMarquee({
   title = "Trusted by industry leaders",
   description = "Join thousands of companies already using our platform",
-  logos = DEFAULT_LOGOS,
+  logos = [],
   speed = "normal",
   direction = "left",
   pauseOnHover = true,
