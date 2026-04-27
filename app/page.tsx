@@ -3,12 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { LogoMarquee } from "../components/ui/smoothui/logo-cloud-3";
 
-interface CopyButtonProps {
-  text: string;
-  className?: string;
-  ariaLabel?: string;
-}
-
 interface TerminalProps {
   isAnimated?: boolean;
 }
@@ -78,95 +72,6 @@ function useInView<T extends HTMLElement = HTMLDivElement>(
 }
 
 
-function CopyButton({
-  text,
-  className = "",
-  ariaLabel = "Copy to clipboard",
-}: CopyButtonProps) {
-  const [isCopied, setIsCopied] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setIsCopied(true);
-      setShowTooltip(true);
-      setError(null);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setIsCopied(false);
-        setShowTooltip(false);
-      }, 2000);
-    } catch {
-      setError("Failed to copy");
-      setShowTooltip(true);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setError(null);
-        setShowTooltip(false);
-      }, 2000);
-    }
-  }, [text]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <button
-      className={`copy-button ${className}`}
-      onClick={handleCopy}
-      aria-label={ariaLabel}
-      aria-live="polite"
-      type="button"
-    >
-      <svg
-        className="copy-icon"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        {isCopied ? (
-          <>
-            <polyline points="20 6 9 17 4 12" />
-          </>
-        ) : (
-          <>
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </>
-        )}
-      </svg>
-      <span
-        className={`copy-tooltip ${showTooltip ? "visible" : ""}`}
-        role="status"
-      >
-        {error || (isCopied ? "Copied!" : "Copy")}
-      </span>
-    </button>
-  );
-}
-
 function NavCTA() {
   const [isCopied, setIsCopied] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -215,39 +120,6 @@ function NavCTA() {
           {isCopied ? "Copied!" : "Copy command"}
         </span>
       )}
-    </div>
-  );
-}
-
-function ToolCommandBlock({
-  tool,
-  index,
-  isInView,
-}: {
-  tool: (typeof tools)[0];
-  index: number;
-  isInView: boolean;
-}) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const command = `simplesetup install ${tool.name.split(" ")[0].toLowerCase()} --ssl`;
-
-  return (
-    <div
-      className={`tool-command-wrapper ${isInView ? "animate-in" : ""}`}
-      style={{
-        transitionDelay: prefersReducedMotion ? "0ms" : `${index * 100}ms`,
-      }}
-    >
-      <code className="tool-command-code">
-        <span className="dollar" style={{ color: "var(--term-green)" }}>
-          $
-        </span>{" "}
-        <span className="cmd">
-          simplesetup install {tool.name.split(" ")[0].toLowerCase()}
-        </span>{" "}
-        <span className="flag">--ssl</span>
-      </code>
-      <CopyButton text={command} ariaLabel={`Copy ${tool.name} install command`} />
     </div>
   );
 }
@@ -464,363 +336,6 @@ function Terminal({ isAnimated = true }: TerminalProps) {
   );
 }
 
-interface OnboardingConfig {
-  tool: string;
-  exposeToInternet: boolean;
-  enableSSL: boolean;
-  autoConfigure: boolean;
-  securityLevel: 'basic' | 'strict' | 'custom';
-  features: string[];
-}
-
-function OnboardingWizard() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const [config, setConfig] = useState<OnboardingConfig>({
-    tool: '',
-    exposeToInternet: false,
-    enableSSL: true,
-    autoConfigure: true,
-    securityLevel: 'basic',
-    features: []
-  });
-  const [generatedCommand, setGeneratedCommand] = useState('');
-  const [isRunning, setIsRunning] = useState(false);
-
-  const tools = [
-    { id: 'n8n', name: 'n8n', desc: 'Workflow automation', icon: 'n8' },
-    { id: 'umami', name: 'Umami', desc: 'Privacy analytics', icon: 'Um' },
-    { id: 'posthog', name: 'PostHog', desc: 'Product analytics', icon: 'PH' },
-    { id: 'openclaw', name: 'OpenClaw', desc: 'Agent runtime', icon: 'OC' }
-  ];
-
-  const generateCommand = () => {
-    let cmd = `npx simplesetup install ${config.tool}`;
-    if (config.exposeToInternet) cmd += ' --public';
-    if (config.enableSSL) cmd += ' --ssl';
-    if (!config.autoConfigure) cmd += ' --manual';
-    cmd += ` --security=${config.securityLevel}`;
-    if (config.features.length > 0) {
-      cmd += ` --features=${config.features.join(',')}`;
-    }
-    return cmd;
-  };
-
-  const handleGenerate = () => {
-    const cmd = generateCommand();
-    setGeneratedCommand(cmd);
-    setStep(4);
-  };
-
-  const handleRun = () => {
-    setIsRunning(true);
-    setIsOpen(false);
-  };
-
-  if (!isOpen) {
-    return (
-      <button 
-        className="btn-primary onboarding-trigger" 
-        onClick={() => setIsOpen(true)}
-        type="button"
-      >
-        <span>Configure Setup</span>
-        <span className="btn-arrow">→</span>
-      </button>
-    );
-  }
-
-  return (
-    <div className="onboarding-modal">
-      <div className="onboarding-backdrop" onClick={() => !isRunning && setIsOpen(false)} />
-      <div className="onboarding-content">
-        <div className="onboarding-header">
-          <h3>Setup Configuration</h3>
-          <button className="close-btn" onClick={() => setIsOpen(false)} type="button">×</button>
-        </div>
-
-        <div className="onboarding-progress">
-          {[1, 2, 3, 4].map((s) => (
-            <div key={s} className={`progress-step ${s === step ? 'active' : ''} ${s < step ? 'completed' : ''}`}>
-              <div className="step-number">{s < step ? '✓' : s}</div>
-              <div className="step-label">
-                {s === 1 && 'Select Tool'}
-                {s === 2 && 'Network'}
-                {s === 3 && 'Security'}
-                {s === 4 && 'Command'}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="onboarding-body">
-          {step === 1 && (
-            <div className="step-content">
-              <h4>Choose your tool</h4>
-              <div className="tool-selection">
-                {tools.map((tool) => (
-                  <button
-                    key={tool.id}
-                    className={`tool-option ${config.tool === tool.id ? 'selected' : ''}`}
-                    onClick={() => setConfig({ ...config, tool: tool.id })}
-                    type="button"
-                  >
-                    <span className="tool-icon">{tool.icon}</span>
-                    <span className="tool-name">{tool.name}</span>
-                    <span className="tool-desc">{tool.desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="step-content">
-              <h4>Network Configuration</h4>
-              <div className="config-options">
-                <label className="config-option">
-                  <input
-                    type="checkbox"
-                    checked={config.exposeToInternet}
-                    onChange={(e) => setConfig({ ...config, exposeToInternet: e.target.checked })}
-                  />
-                  <span className="checkmark" />
-                  <div className="option-info">
-                    <span className="option-label">Expose to Internet</span>
-                    <span className="option-desc">Make accessible from the web (requires SSL)</span>
-                  </div>
-                </label>
-
-                <label className="config-option">
-                  <input
-                    type="checkbox"
-                    checked={config.enableSSL}
-                    onChange={(e) => setConfig({ ...config, enableSSL: e.target.checked })}
-                  />
-                  <span className="checkmark" />
-                  <div className="option-info">
-                    <span className="option-label">Enable SSL</span>
-                    <span className="option-desc">Auto-generate SSL certificates</span>
-                  </div>
-                </label>
-
-                <label className="config-option">
-                  <input
-                    type="checkbox"
-                    checked={config.autoConfigure}
-                    onChange={(e) => setConfig({ ...config, autoConfigure: e.target.checked })}
-                  />
-                  <span className="checkmark" />
-                  <div className="option-info">
-                    <span className="option-label">Auto-configure</span>
-                    <span className="option-desc">Automatically optimize settings</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="step-content">
-              <h4>Security Level</h4>
-              <div className="security-options">
-                {(['basic', 'strict', 'custom'] as const).map((level) => (
-                  <button
-                    key={level}
-                    className={`security-option ${config.securityLevel === level ? 'selected' : ''}`}
-                    onClick={() => setConfig({ ...config, securityLevel: level })}
-                    type="button"
-                  >
-                    <span className="security-name">{level.charAt(0).toUpperCase() + level.slice(1)}</span>
-                    <span className="security-desc">
-                      {level === 'basic' && 'Standard security, quick setup'}
-                      {level === 'strict' && 'Enhanced security, firewall rules'}
-                      {level === 'custom' && 'Manual security configuration'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="step-content">
-              <h4>Generated Command</h4>
-              <div className="command-preview">
-                <code>{generatedCommand}</code>
-                <CopyButton text={generatedCommand} ariaLabel="Copy generated command" />
-              </div>
-              <p className="command-help">Run this command to set up your {config.tool} instance</p>
-            </div>
-          )}
-        </div>
-
-        <div className="onboarding-footer">
-          {step > 1 && (
-            <button className="btn-secondary" onClick={() => setStep(step - 1)} type="button">
-              Back
-            </button>
-          )}
-          {step < 3 ? (
-            <button 
-              className="btn-primary" 
-              onClick={() => setStep(step + 1)}
-              disabled={step === 1 && !config.tool}
-              type="button"
-            >
-              Continue
-            </button>
-          ) : step === 3 ? (
-            <button className="btn-primary" onClick={handleGenerate} type="button">
-              Generate Command
-            </button>
-          ) : (
-            <button className="btn-primary" onClick={handleRun} type="button">
-              Run Setup
-            </button>
-          )}
-        </div>
-      </div>
-
-      {isRunning && <TUIRunner command={generatedCommand} onClose={() => setIsRunning(false)} />}
-    </div>
-  );
-}
-
-interface TUIRunnerProps {
-  command: string;
-  onClose: () => void;
-}
-
-function TUIRunner({ command, onClose }: TUIRunnerProps) {
-  const [logs, setLogs] = useState<string[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState<'running' | 'success' | 'error'>('running');
-  const [currentStep, setCurrentStep] = useState(0);
-  const logsEndRef = useRef<HTMLDivElement>(null);
-
-  const steps = [
-    'Initializing setup...',
-    'Checking prerequisites...',
-    'Downloading tool images...',
-    'Configuring environment...',
-    'Setting up SSL certificates...',
-    'Starting services...',
-    'Running health checks...',
-    'Finalizing installation...'
-  ];
-
-  useEffect(() => {
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += Math.random() * 15;
-      if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(interval);
-        setStatus('success');
-      }
-      setProgress(Math.min(currentProgress, 100));
-      
-      const stepIndex = Math.floor((currentProgress / 100) * steps.length);
-      if (stepIndex !== currentStep && stepIndex < steps.length) {
-        setCurrentStep(stepIndex);
-        setLogs(prev => [...prev, `✓ ${steps[stepIndex]}`]);
-      }
-    }, 800);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [logs]);
-
-  return (
-    <div className="tui-runner">
-      <div className="tui-backdrop" />
-      <div className="tui-window">
-        <div className="tui-header">
-          <div className="tui-title">
-            <span className="tui-dot running" />
-            simplesetup
-          </div>
-          <button className="tui-close" onClick={onClose} type="button">×</button>
-        </div>
-
-        <div className="tui-body">
-          <div className="tui-command">
-            <span className="prompt">$</span>
-            <span className="command">{command}</span>
-          </div>
-
-          <div className="tui-progress">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <span className="progress-text">{Math.round(progress)}%</span>
-          </div>
-
-          <div className="tui-current-step">
-            {currentStep < steps.length ? steps[currentStep] : 'Complete!'}
-          </div>
-
-          <div className="tui-logs">
-            {logs.map((log, i) => (
-              <div key={i} className="tui-log">{log}</div>
-            ))}
-            <div ref={logsEndRef} />
-          </div>
-
-          {status === 'success' && (
-            <div className="tui-success">
-              <div className="success-icon">✓</div>
-              <div className="success-text">Setup complete!</div>
-              <div className="success-url">https://your-domain.com</div>
-              <button className="btn-primary" onClick={onClose} type="button">
-                Done
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ToolCard({
-  tool,
-  index,
-  isInView,
-}: {
-  tool: (typeof tools)[0];
-  index: number;
-  isInView: boolean;
-}) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  return (
-    <article
-      className={`tool-card ${isInView ? "animate-in" : ""}`}
-      style={{
-        transitionDelay: prefersReducedMotion ? "0ms" : `${index * 100}ms`,
-      }}
-    >
-      <div className="tool-card-header">
-        <span className="tool-icon">{tool.icon}</span>
-        <span className="tool-type">{tool.type}</span>
-      </div>
-
-      <h3 className="tool-name">{tool.name}</h3>
-      <p className="tool-description">{tool.description}</p>
-
-      <ToolCommandBlock tool={tool} index={index} isInView={isInView} />
-    </article>
-  );
-}
-
 function StepItem({
   step,
   index,
@@ -855,7 +370,7 @@ function StepItem({
 
 function CTACopyButton() {
   const [feedback, setFeedback] = useState<"copied" | "failed" | null>(null);
-  const command = "npx simplesetup init";
+  const command = "npm run tui:openclaw";
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCopy = useCallback(async () => {
@@ -894,7 +409,7 @@ function CTACopyButton() {
       <button
         className="cta-button-terminal"
         onClick={handleCopy}
-        aria-label="Copy npx command"
+        aria-label="Copy TUI command"
         type="button"
       >
         <span className="cta-command">
@@ -912,170 +427,41 @@ function CTACopyButton() {
   );
 }
 
+function LaunchTuiButton() {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-const tools = [
-  {
-    name: "n8n",
-    type: "Automation",
-    description:
-      "Deploy workflows with SSL, queue mode, and health checks already wired.",
-    command: "simplesetup install n8n --ssl --domain ops.example.com",
-    icon: "n8",
-  },
-  {
-    name: "Umami",
-    type: "Analytics",
-    description:
-      "Launch privacy-first analytics with a hardened Postgres setup in one pass.",
-    command: "simplesetup install umami --postgres --timezone UTC",
-    icon: "Um",
-  },
-  {
-    name: "PostHog",
-    type: "Product Data",
-    description:
-      "Run events, feature flags, and product analytics on your own infrastructure.",
-    command: "simplesetup install posthog --mode self-hosted",
-    icon: "PH",
-  },
-  {
-    name: "OpenClaw",
-    type: "Agent Runtime",
-    description:
-      "Bring local agent orchestration online with clear runtime and storage defaults.",
-    command: "simplesetup install openclaw --runtime docker",
-    icon: "OC",
-  },
-  {
-    name: "Supabase",
-    type: "Database",
-    description:
-      "Deploy the open-source Firebase alternative with Postgres, Auth, and Realtime.",
-    command: "simplesetup install supabase --ssl --domain db.example.com",
-    icon: "Sb",
-  },
-  {
-    name: "Ghost",
-    type: "Publishing",
-    description:
-      "Deploy professional publishing platform with memberships and newsletters.",
-    command: "simplesetup install ghost --domain blog.example.com",
-    icon: "Gh",
-  },
-  {
-    name: "Plausible",
-    type: "Analytics",
-    description:
-      "Lightweight, privacy-focused Google Analytics alternative with dashboard.",
-    command: "simplesetup install plausible --ssl --domain analytics.example.com",
-    icon: "Pl",
-  },
-  {
-    name: "Metabase",
-    type: "Business Intelligence",
-    description:
-      "Deploy business intelligence and analytics with SQL and visual query builder.",
-    command: "simplesetup install metabase --domain bi.example.com",
-    icon: "Mb",
-  },
-  {
-    name: "Grafana",
-    type: "Observability",
-    description:
-      "Set up observability platform with metrics, logs, and tracing dashboards.",
-    command: "simplesetup install grafana --domain metrics.example.com",
-    icon: "Gf",
-  },
-  {
-    name: "MinIO",
-    type: "Storage",
-    description:
-      "Deploy S3-compatible object storage for high-performance data lakes.",
-    command: "simplesetup install minio --domain storage.example.com",
-    icon: "Mn",
-  },
-  {
-    name: "Redpanda",
-    type: "Streaming",
-    description:
-      "Set up Kafka-compatible event streaming platform with lower latencies.",
-    command: "simplesetup install redpanda --domain stream.example.com",
-    icon: "Rp",
-  },
-  {
-    name: "GitLab",
-    type: "DevOps",
-    description:
-      "Deploy Git repository management, CI/CD, and DevOps lifecycle platform.",
-    command: "simplesetup install gitlab --domain git.example.com",
-    icon: "Gl",
-  },
-  {
-    name: "Mastodon",
-    type: "Social",
-    description:
-      "Set up decentralized social network server with ActivityPub federation.",
-    command: "simplesetup install mastodon --domain social.example.com",
-    icon: "Ma",
-  },
-  {
-    name: "Nextcloud",
-    type: "Productivity",
-    description:
-      "Deploy content collaboration platform with files, docs, and calendars.",
-    command: "simplesetup install nextcloud --domain cloud.example.com",
-    icon: "Nc",
-  },
-  {
-    name: "Outline",
-    type: "Documentation",
-    description:
-      "Set up team knowledge base and wiki with real-time collaborative editing.",
-    command: "simplesetup install outline --domain docs.example.com",
-    icon: "Ol",
-  },
-  {
-    name: "Appwrite",
-    type: "Backend",
-    description:
-      "Deploy open-source backend-as-a-service with auth, databases, and storage.",
-    command: "simplesetup install appwrite --domain backend.example.com",
-    icon: "Aw",
-  },
-  {
-    name: "PocketBase",
-    type: "Backend",
-    description:
-      "Set up open-source backend in one file with realtime database and auth.",
-    command: "simplesetup install pocketbase --domain api.example.com",
-    icon: "Pb",
-  },
-  {
-    name: "Directus",
-    type: "CMS",
-    description:
-      "Deploy headless CMS that wraps any SQL database with REST and GraphQL.",
-    command: "simplesetup install directus --domain cms.example.com",
-    icon: "Dr",
-  },
-  {
-    name: "Strapi",
-    type: "CMS",
-    description:
-      "Set up Node.js headless CMS with customizable API and admin panel.",
-    command: "simplesetup install strapi --domain content.example.com",
-    icon: "St",
-  },
-  {
-    name: "Penpot",
-    type: "Design",
-    description:
-      "Deploy open-source design and prototyping platform for product teams.",
-    command: "simplesetup install penpot --domain design.example.com",
-    icon: "Pp",
-  },
-];
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText("npm run tui:openclaw");
+      setCopied(true);
 
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch {
+      setCopied(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <button className="btn-primary" onClick={handleCopy} type="button">
+      {copied ? "Copied: npm run tui:openclaw" : "Launch OpenClaw TUI"}
+    </button>
+  );
+}
 const heroTools = ["n8n", "OpenClaw", "Supabase", "PostHog", "Grafana"];
 
 const logoTools = [
@@ -1175,9 +561,7 @@ export default function Home() {
               </p>
 
               <div className="hero-actions">
-                <a href="#tools" className="btn-primary">
-                  Explore tools
-                </a>
+                <LaunchTuiButton />
                 <a href="#how-it-works" className="btn-secondary">
                   See how it works
                 </a>
@@ -1235,11 +619,14 @@ export default function Home() {
             <div className="cta-content">
               <h2 className="cta-title">Start your first setup now</h2>
               <p className="cta-text">
-                Run one command to initialize SimpleSetup, then pick any stack in the
-                guided flow.
+                Launch the terminal flow, configure OpenClaw, and deploy from one guided
+                command path.
               </p>
 
               <CTACopyButton />
+              <p className="cta-link-row">
+                Prefer terminal setup? Run <code>npm run tui:openclaw</code>
+              </p>
             </div>
           </div>
         </section>

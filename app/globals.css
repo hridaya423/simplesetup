@@ -1287,6 +1287,18 @@ a {
   opacity: 1;
 }
 
+.cta-link-row {
+  margin: 0.85rem 0 0;
+  color: var(--term-gray);
+  font-size: 0.86rem;
+  font-family: var(--font-mono), monospace;
+}
+
+.cta-link-row a {
+  color: var(--term-white);
+  text-decoration: underline;
+}
+
 .footer {
   margin-top: var(--space-xl);
   padding: 0;
