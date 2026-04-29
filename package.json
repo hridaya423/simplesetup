@@ -1,14 +1,24 @@
 {
   "name": "simplesetup",
   "version": "0.1.0",
-  "private": true,
+  "description": "Deploy open-source tools with one command. OpenClaw TUI and guided setup.",
+  "bin": {
+    "simplesetup": "dist/cli.cjs"
+  },
+  "files": [
+    "dist",
+    "cli",
+    "lib"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "tui": "tsx cli/index.ts",
-    "tui:openclaw": "tsx cli/index.ts --tool openclaw"
+    "tui:openclaw": "tsx cli/index.ts --tool openclaw",
+    "build:cli": "node scripts/build-cli.js",
+    "build:binaries": "npm run build:cli && pkg dist/package.json --out-path dist/bin"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -27,10 +37,27 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@yao-pkg/pkg": "^6.4.0",
+    "esbuild": "^0.25.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "openclaw",
+    "self-hosted",
+    "cli",
+    "tui",
+    "deployment"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hridaya423/simplesetup.git"
   }
 }

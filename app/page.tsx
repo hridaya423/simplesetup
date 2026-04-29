@@ -73,54 +73,15 @@ function useInView<T extends HTMLElement = HTMLDivElement>(
 
 
 function NavCTA() {
-  const [isCopied, setIsCopied] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText("npm install -g simplesetup");
-      setIsCopied(true);
-      setShowTooltip(true);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setIsCopied(false);
-        setShowTooltip(false);
-      }, 2000);
-    } catch {
-      setShowTooltip(true);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setShowTooltip(false);
-      }, 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
-    <div className="nav-cta-wrapper">
-      <button className="nav-cta" onClick={handleCopy} type="button">
-        <span className="nav-cta-text">$ install</span>
-      </button>
-      {showTooltip && (
-        <span className="nav-cta-tooltip">
-          {isCopied ? "Copied!" : "Copy command"}
-        </span>
-      )}
-    </div>
+    <a
+      href="https://github.com/hridaya423/simplesetup/releases/latest"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="nav-cta"
+    >
+      <span className="nav-cta-text">Download</span>
+    </a>
   );
 }
 
@@ -346,7 +307,7 @@ function StepItem({
   isInView: boolean;
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const titles = ["Initialize", "Install", "Deploy"];
+  const titles = ["Download", "Run", "Ready"];
 
   return (
     <div
@@ -359,7 +320,7 @@ function StepItem({
       <div className="step-content">
         <h3 className="step-title">{titles[index]}</h3>
         <p className="step-command">
-          <span className="dollar">$</span>
+          <span className="dollar">$ </span>
           {step.command}
         </p>
         <p className="step-description">{step.description}</p>
@@ -369,100 +330,31 @@ function StepItem({
 }
 
 function CTACopyButton() {
-  const [feedback, setFeedback] = useState<"copied" | "failed" | null>(null);
-  const command = "npm run tui:openclaw";
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(command);
-      setFeedback("copied");
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setFeedback(null);
-      }, 2000);
-    } catch {
-      setFeedback("failed");
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setFeedback(null);
-      }, 2000);
-    }
-  }, [command]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
-    <div className="cta-button-wrapper">
-      <button
-        className="cta-button-terminal"
-        onClick={handleCopy}
-        aria-label="Copy TUI command"
-        type="button"
-      >
-        <span className="cta-command">
-          <span className="dollar">$</span>
-          <span className="cmd">{command}</span>
-        </span>
-        <span className="cta-copy-pill">
-          {feedback === "copied" ? "Copied" : "Copy"}
-        </span>
-      </button>
-      {feedback === "failed" ? (
-        <span className="cta-tooltip visible">Copy failed</span>
-      ) : null}
-    </div>
+    <a
+      href="https://github.com/hridaya423/simplesetup/releases/latest"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn-primary"
+    >
+      Get the latest release
+    </a>
   );
 }
 
 function LaunchTuiButton() {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText("npm run tui:openclaw");
-      setCopied(true);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch {
-      setCopied(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
-    <button className="btn-primary" onClick={handleCopy} type="button">
-      {copied ? "Copied: npm run tui:openclaw" : "Launch OpenClaw TUI"}
-    </button>
+    <a
+      href="https://github.com/hridaya423/simplesetup/releases/latest"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn-primary"
+    >
+      Download CLI
+    </a>
   );
 }
-const heroTools = ["n8n", "OpenClaw", "Supabase", "PostHog", "Grafana"];
+const heroTools = ["OpenClaw"];
 
 const logoTools = [
   { name: "n8n", slug: "n8n" },
@@ -494,18 +386,18 @@ const logoTools = [
 const steps = [
   {
     number: "01",
-    command: "simplesetup init",
-    description: "Connect your server and validate the environment.",
+    command: "download simplesetup",
+    description: "Grab the binary for your platform from GitHub Releases. No install needed.",
   },
   {
     number: "02",
-    command: "simplesetup install <tool>",
-    description: "Choose from 20+ self-hosted tools including Supabase, Grafana, GitLab, and more.",
+    command: "./simplesetup --tool openclaw",
+    description: "Launch the TUI, pick your auth provider, channels, and run the guided OpenClaw wizard.",
   },
   {
     number: "03",
-    command: "Live at https://your-domain.com",
-    description: "Your tool is deployed and ready to use.",
+    command: "openclaw status --deep",
+    description: "OpenClaw is set up with your config, channels, and diagnostics ready to go.",
     isSuccess: true,
   },
 ];
@@ -519,6 +411,12 @@ export default function Home() {
   return (
     <div className="site-shell">
       <div className="noise-overlay" aria-hidden="true" />
+
+      <div className="top-banner">
+        <span className="top-banner-text">
+          Only OpenClaw flow is setup right now — more tools coming soon
+        </span>
+      </div>
 
       <header className="nav-shell">
         <nav className="nav-inner">
@@ -556,8 +454,8 @@ export default function Home() {
               </h1>
 
               <p className="hero-text">
-                Deploy 20+ open-source tools like Supabase, Grafana, GitLab, and
-                n8n with one clean command. No Docker knowledge required.
+                Guided OpenClaw setup through a terminal UI. Pick your auth,
+                channels, and deploy with real commands. No config files to write.
               </p>
 
               <div className="hero-actions">
@@ -584,8 +482,8 @@ export default function Home() {
 
         <section id="tools">
           <LogoMarquee
-            title="Supported tools"
-            description="One command deployment for 20+ self-hosted tools"
+            title="On the roadmap"
+            description="OpenClaw is ready now. More self-hosted tools coming next."
             logos={logoTools}
             speed="slow"
             pauseOnHover={true}
@@ -619,14 +517,108 @@ export default function Home() {
             <div className="cta-content">
               <h2 className="cta-title">Start your first setup now</h2>
               <p className="cta-text">
-                Launch the terminal flow, configure OpenClaw, and deploy from one guided
-                command path.
+                Download the CLI for your platform, run it, and follow the guided OpenClaw
+                setup flow.
               </p>
 
               <CTACopyButton />
               <p className="cta-link-row">
-                Prefer terminal setup? Run <code>npm run tui:openclaw</code>
+                Or build from source with <code>npm run build:cli</code>
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="section">
+          <div className="download-section">
+            <span className="section-eyebrow">Install</span>
+            <h2 className="section-title">Get the CLI</h2>
+            <p className="section-description">
+              Download a standalone binary for your platform. No dependencies required.
+            </p>
+
+            <div className="install-methods">
+              <div className="install-card">
+                <div className="install-card-header">
+                  <span className="install-icon">⬇</span>
+                  <span className="install-type">Binary</span>
+                </div>
+                <h3 className="install-title">GitHub Releases</h3>
+                <p className="install-description">
+                  Standalone binaries. No Node.js required. Works offline.
+                </p>
+                <div className="download-links">
+                  <a
+                    href="https://github.com/hridaya423/simplesetup/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="download-link"
+                  >
+                    macOS (Apple Silicon)
+                  </a>
+                  <a
+                    href="https://github.com/hridaya423/simplesetup/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="download-link"
+                  >
+                    macOS (Intel)
+                  </a>
+                  <a
+                    href="https://github.com/hridaya423/simplesetup/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="download-link"
+                  >
+                    Linux (x64)
+                  </a>
+                  <a
+                    href="https://github.com/hridaya423/simplesetup/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="download-link"
+                  >
+                    Linux (ARM64)
+                  </a>
+                  <a
+                    href="https://github.com/hridaya423/simplesetup/releases/latest"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="download-link"
+                  >
+                    Windows (x64)
+                  </a>
+                </div>
+              </div>
+
+              <div className="install-card">
+                <div className="install-card-header">
+                  <span className="install-icon">⚒</span>
+                  <span className="install-type">Source</span>
+                </div>
+                <h3 className="install-title">Build from source</h3>
+                <p className="install-description">
+                  Clone the repo, install deps, and run with Node 20+.
+                </p>
+                <div className="install-command-wrapper">
+                  <code className="install-command-code">
+                    <span className="dollar">$</span>
+                    <span className="cmd"> git clone https://github.com/hridaya423/simplesetup.git</span>
+                  </code>
+                </div>
+                <div className="install-command-wrapper" style={{ marginTop: "0.5rem" }}>
+                  <code className="install-command-code">
+                    <span className="dollar">$</span>
+                    <span className="cmd"> cd simplesetup && npm install</span>
+                  </code>
+                </div>
+                <div className="install-command-wrapper" style={{ marginTop: "0.5rem" }}>
+                  <code className="install-command-code">
+                    <span className="dollar">$</span>
+                    <span className="cmd"> npm run tui:openclaw</span>
+                  </code>
+                </div>
+              </div>
             </div>
           </div>
         </section>
