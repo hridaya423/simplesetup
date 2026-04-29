@@ -1,6 +1,6 @@
 {
   "name": "simplesetup",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deploy open-source tools with one command. OpenClaw TUI and guided setup.",
   "bin": {
     "simplesetup": "dist/cli.cjs"
