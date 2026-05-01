@@ -14,7 +14,6 @@ async function main() {
     format: "cjs",
     outfile: path.join(outDir, "cli.cjs"),
     external: ["neo-blessed"],
-
     define: {
       "import.meta.url": "__filename",
     },
@@ -36,7 +35,7 @@ async function main() {
     version: require("../package.json").version,
     bin: { simplesetup: "cli.cjs" },
     pkg: {
-      assets: ["node_modules/neo-blessed/**/*"],
+      assets: ["../node_modules/neo-blessed/**/*"],
       targets: ["node20-macos-arm64", "node20-macos-x64", "node20-linux-x64", "node20-linux-arm64", "node20-win-x64"],
       outputPath: "bin",
     },

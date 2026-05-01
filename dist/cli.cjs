@@ -1,13 +1,35 @@
 #!/usr/bin/env node
 "use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
 // cli/index.ts
 var import_node_child_process = require("node:child_process");
 var import_node_fs = require("node:fs");
 var import_promises = require("node:fs/promises");
-var import_node_module = require("node:module");
 var import_node_os = require("node:os");
 var import_node_path = require("node:path");
+var import_neo_blessed = __toESM(require("neo-blessed"), 1);
 
 // cli/openclaw-domain.ts
 var PRIMARY_GOALS = [
@@ -395,8 +417,6 @@ function buildOpenClawExecutionPlan(state) {
 }
 
 // cli/index.ts
-var require2 = (0, import_node_module.createRequire)(__filename);
-var blessed = require2("neo-blessed");
 var TOOLS = [
   {
     id: "openclaw",
@@ -452,7 +472,7 @@ var SimpleSetupTui = class {
     this.introReady = false;
     this.openclawStatus = this.detectOpenClawLocalStatus();
     this.forcedTool = forcedTool;
-    this.screen = blessed.screen({
+    this.screen = import_neo_blessed.default.screen({
       smartCSR: true,
       fullUnicode: true,
       title: "SimpleSetup TUI",
@@ -539,7 +559,7 @@ var SimpleSetupTui = class {
     const heroWidth = Math.max(70, Math.min(cols - 4, 170));
     const heroHeight = Math.max(16, Math.min(rows - 4, 28));
     const heroTop = Math.max(1, Math.floor((rows - heroHeight) / 2));
-    const root = blessed.box({
+    const root = import_neo_blessed.default.box({
       parent: this.screen,
       width: "100%",
       height: "100%",
@@ -547,7 +567,7 @@ var SimpleSetupTui = class {
         bg: INTRO_BG
       }
     });
-    const backdrop = blessed.box({
+    const backdrop = import_neo_blessed.default.box({
       parent: root,
       top: 0,
       left: 0,
@@ -639,7 +659,7 @@ var SimpleSetupTui = class {
     const logoFrameTop = Math.max(1, Math.floor((heroHeight - logoFrameHeight) / 2) - 1);
     const logoFrameAbsoluteTop = heroTop + logoFrameTop;
     const ctaTopAbsolute = Math.min(rows - 2, logoFrameAbsoluteTop + logoFrameHeight + 1);
-    const logoBox = blessed.box({
+    const logoBox = import_neo_blessed.default.box({
       parent: root,
       top: logoFrameAbsoluteTop,
       left: "center",
@@ -648,7 +668,7 @@ var SimpleSetupTui = class {
       tags: true,
       align: "center"
     });
-    const cta = blessed.box({
+    const cta = import_neo_blessed.default.box({
       parent: root,
       top: ctaTopAbsolute,
       left: "center",
@@ -751,7 +771,7 @@ var SimpleSetupTui = class {
     const compact = cols < 112;
     const contentWidth = Math.min(Math.max(72, Math.min(cols - 6, 146)), Math.max(72, cols - 2));
     const contentLeft = Math.max(2, Math.floor((cols - contentWidth) / 2));
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 0,
       left: contentLeft,
@@ -760,7 +780,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: this.openclawStatus.configPresent ? `{${UI_MUTED}-fg}\u25C9 Existing OpenClaw setup{/}  {${UI_DIM}-fg}\u2022{/}  {${ACCENT_SECONDARY}-fg}Manage mode{/}` : `{${UI_MUTED}-fg}\u25C9 Clean machine{/}  {${UI_DIM}-fg}\u2022{/}  {${ACCENT_SECONDARY}-fg}New install mode{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 1,
       left: contentLeft,
@@ -769,7 +789,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: this.openclawStatus.configPresent ? `{${UI_DIM}-fg}Add channels, repair issues, refresh setup, or uninstall cleanly.{/}` : `{${UI_DIM}-fg}Guided onboarding with real OpenClaw commands and diagnostics.{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 2,
       left: contentLeft,
@@ -778,7 +798,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(120)}{/}`
     });
-    const stage = blessed.box({
+    const stage = import_neo_blessed.default.box({
       parent: frame.body,
       top: 4,
       left: contentLeft,
@@ -788,7 +808,7 @@ var SimpleSetupTui = class {
         bg: UI_BG
       }
     });
-    const leftPane = blessed.box({
+    const leftPane = import_neo_blessed.default.box({
       parent: stage,
       top: 1,
       left: 1,
@@ -805,7 +825,7 @@ var SimpleSetupTui = class {
         type: "line"
       }
     });
-    const rightPane = blessed.box({
+    const rightPane = import_neo_blessed.default.box({
       parent: stage,
       top: compact ? "48%" : 1,
       left: compact ? 1 : "43%+1",
@@ -822,7 +842,7 @@ var SimpleSetupTui = class {
         type: "line"
       }
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: leftPane,
       top: 0,
       left: 1,
@@ -831,7 +851,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${ACCENT_SECONDARY}-fg}{bold}Flows{/bold}{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: rightPane,
       top: 0,
       left: 1,
@@ -840,7 +860,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${ACCENT_SECONDARY}-fg}{bold}Preview{/bold}{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: leftPane,
       top: 1,
       left: 1,
@@ -849,7 +869,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(120)}{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: rightPane,
       top: 1,
       left: 1,
@@ -858,7 +878,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(120)}{/}`
     });
-    const list = blessed.list({
+    const list = import_neo_blessed.default.list({
       parent: leftPane,
       top: 3,
       left: 1,
@@ -884,7 +904,7 @@ var SimpleSetupTui = class {
         }
       }
     });
-    const detail = blessed.box({
+    const detail = import_neo_blessed.default.box({
       parent: rightPane,
       top: 3,
       left: 1,
@@ -1231,7 +1251,7 @@ var SimpleSetupTui = class {
     const options = step.options(this.state);
     const progress = Math.round(stepNumber / Math.max(totalSteps, 1) * 100);
     const journeyLabel = this.state.operationMode === "manage-existing" ? "manage" : this.state.setupTrack;
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 0,
       left: contentLeft,
@@ -1240,7 +1260,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_MUTED}-fg}\u25C9 ${progress}% complete{/}  {${UI_DIM}-fg}\u2022{/}  {${ACCENT_SECONDARY}-fg}${journeyLabel}{/}  {${UI_DIM}-fg}\u2022{/}  {${UI_MUTED}-fg}Choose one option and preview the exact command plan.{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 1,
       left: contentLeft,
@@ -1249,7 +1269,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(140)}{/}`
     });
-    const stage = blessed.box({
+    const stage = import_neo_blessed.default.box({
       parent: frame.body,
       top: 3,
       left: contentLeft,
@@ -1259,7 +1279,7 @@ var SimpleSetupTui = class {
         bg: UI_BG
       }
     });
-    const leftPane = blessed.box({
+    const leftPane = import_neo_blessed.default.box({
       parent: stage,
       top: 1,
       left: 1,
@@ -1270,7 +1290,7 @@ var SimpleSetupTui = class {
       },
       tags: true
     });
-    const rightPane = blessed.box({
+    const rightPane = import_neo_blessed.default.box({
       parent: stage,
       top: compact ? "46%" : 1,
       left: compact ? 1 : "41%+1",
@@ -1282,7 +1302,7 @@ var SimpleSetupTui = class {
       tags: true
     });
     if (!compact) {
-      blessed.box({
+      import_neo_blessed.default.box({
         parent: stage,
         top: 1,
         left: "41%",
@@ -1292,7 +1312,7 @@ var SimpleSetupTui = class {
         content: Array.from({ length: Math.max(1, (typeof this.screen.height === "number" ? this.screen.height : 40) - 10) }, () => `{${UI_BORDER}-fg}\u2502{/}`).join("\n")
       });
     }
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: leftPane,
       top: 0,
       left: 1,
@@ -1301,7 +1321,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${ACCENT_SECONDARY}-fg}{bold}Choose{/bold}{/}  {${UI_DIM}-fg}${step.title.toLowerCase()}{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: leftPane,
       top: 1,
       left: 1,
@@ -1310,7 +1330,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(120)}{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: rightPane,
       top: 0,
       left: 1,
@@ -1319,7 +1339,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${ACCENT_SECONDARY}-fg}{bold}Dynamic Preview{/bold}{/}  {${UI_DIM}-fg}updates as you move{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: rightPane,
       top: 1,
       left: 1,
@@ -1328,7 +1348,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(120)}{/}`
     });
-    const list = blessed.list({
+    const list = import_neo_blessed.default.list({
       parent: leftPane,
       top: 3,
       left: 1,
@@ -1354,7 +1374,7 @@ var SimpleSetupTui = class {
         }
       }
     });
-    const detail = blessed.box({
+    const detail = import_neo_blessed.default.box({
       parent: rightPane,
       top: 3,
       left: 1,
@@ -1437,7 +1457,7 @@ var SimpleSetupTui = class {
     const cols = typeof this.screen.width === "number" ? this.screen.width : 120;
     const panelWidth = Math.max(62, Math.min(cols - 8, 104));
     const isSecretInput = ["token", "password", "api-key"].some((marker) => step.id.includes(marker));
-    const panel = blessed.box({
+    const panel = import_neo_blessed.default.box({
       parent: frame.body,
       top: "center",
       left: "center",
@@ -1456,7 +1476,7 @@ var SimpleSetupTui = class {
       tags: true,
       label: " Input "
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: panel,
       top: 1,
       left: 2,
@@ -1465,7 +1485,7 @@ var SimpleSetupTui = class {
       content: `{bold}${step.title}{/bold}`,
       tags: true
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: panel,
       top: 2,
       left: 2,
@@ -1474,7 +1494,7 @@ var SimpleSetupTui = class {
       content: `{${UI_MUTED}-fg}${step.subtitle}{/}`,
       tags: true
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: panel,
       top: 3,
       left: 2,
@@ -1483,7 +1503,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_DIM}-fg}${"\u2500".repeat(52)}{/}`
     });
-    const input = blessed.textbox({
+    const input = import_neo_blessed.default.textbox({
       parent: panel,
       top: 5,
       left: 2,
@@ -1505,7 +1525,7 @@ var SimpleSetupTui = class {
       },
       value: step.defaultValue(this.state) || step.placeholder
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: panel,
       top: 9,
       left: 2,
@@ -1514,7 +1534,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: isSecretInput ? `{${UI_MUTED}-fg}Secret mode: value is masked and only used for this run{/}` : `{${UI_MUTED}-fg}Input mode: plain text (you can edit before submit){/}`
     });
-    const errorBox = blessed.box({
+    const errorBox = import_neo_blessed.default.box({
       parent: panel,
       top: 11,
       left: 2,
@@ -1562,7 +1582,7 @@ var SimpleSetupTui = class {
     const compact = cols < 118;
     const contentWidth = Math.min(Math.max(72, Math.min(cols - 6, 146)), Math.max(72, cols - 2));
     const contentLeft = Math.max(2, Math.floor((cols - contentWidth) / 2));
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 0,
       left: contentLeft,
@@ -1571,7 +1591,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_MUTED}-fg}\u25C9 final review{/}  {${UI_DIM}-fg}\u2022{/}  {${ACCENT_SECONDARY}-fg}real commands{/}  {${UI_DIM}-fg}\u2022{/}  {${UI_MUTED}-fg}launch now or save script{/}`
     });
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: frame.body,
       top: 1,
       left: contentLeft,
@@ -1580,7 +1600,7 @@ var SimpleSetupTui = class {
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(140)}{/}`
     });
-    const stage = blessed.box({
+    const stage = import_neo_blessed.default.box({
       parent: frame.body,
       top: 3,
       left: contentLeft,
@@ -1591,7 +1611,7 @@ var SimpleSetupTui = class {
       },
       tags: true
     });
-    const summary = blessed.box({
+    const summary = import_neo_blessed.default.box({
       parent: stage,
       top: 1,
       left: 1,
@@ -1629,7 +1649,7 @@ var SimpleSetupTui = class {
     );
     const executionPlan = buildOpenClawExecutionPlan(this.state);
     const applyCommand = buildOpenClawApplyCommand(this.state);
-    const commandBox = blessed.box({
+    const commandBox = import_neo_blessed.default.box({
       parent: stage,
       top: compact ? "34%+2" : 1,
       left: compact ? 1 : "34%+1",
@@ -1657,7 +1677,7 @@ var SimpleSetupTui = class {
         `$ ${applyCommand}`
       ].join("\n")
     });
-    const actionList = blessed.list({
+    const actionList = import_neo_blessed.default.list({
       parent: stage,
       top: compact ? "78%" : "74%",
       left: compact ? 1 : "34%+1",
@@ -1733,7 +1753,7 @@ var SimpleSetupTui = class {
   async showRunScreen(executionPlan) {
     this.resetCanvas();
     const frame = this.makeFrame("Running OpenClaw plan", "Executing each command with live output and safe failure handling.");
-    const commandBox = blessed.box({
+    const commandBox = import_neo_blessed.default.box({
       parent: frame.body,
       top: 0,
       left: 0,
@@ -1756,7 +1776,7 @@ $ ${executionPlan[0].displayCommand ?? executionPlan[0].command}` : "No executio
         right: 1
       }
     });
-    const logBox = blessed.box({
+    const logBox = import_neo_blessed.default.box({
       parent: frame.body,
       top: 5,
       left: 0,
@@ -1889,7 +1909,7 @@ Step failed with exit code ${code}.`);
     this.render();
   }
   makeFrame(title, subtitle) {
-    const root = blessed.box({
+    const root = import_neo_blessed.default.box({
       parent: this.screen,
       width: "100%",
       height: "100%",
@@ -1897,7 +1917,7 @@ Step failed with exit code ${code}.`);
         bg: UI_BG
       }
     });
-    const header = blessed.box({
+    const header = import_neo_blessed.default.box({
       parent: root,
       top: 0,
       left: 0,
@@ -1913,7 +1933,7 @@ Step failed with exit code ${code}.`);
       ` {${ACCENT_SECONDARY}-fg}{bold}SIMPLESETUP{/bold}{/} {${UI_DIM}-fg}\u25E6{/} {${ACCENT_PRIMARY}-fg}OPENCLAW{/}
  {${ACCENT_PRIMARY}-fg}{bold}${title}{/bold}{/}${stepTag ? `  {${UI_DIM}-fg}${stepTag}{/}` : ""}`
     );
-    blessed.box({
+    import_neo_blessed.default.box({
       parent: root,
       top: 2,
       left: 1,
@@ -1922,7 +1942,7 @@ Step failed with exit code ${code}.`);
       tags: true,
       content: `{${UI_BORDER}-fg}${"\u2500".repeat(180)}{/}`
     });
-    const body = blessed.box({
+    const body = import_neo_blessed.default.box({
       parent: root,
       top: 3,
       left: 0,
@@ -1932,7 +1952,7 @@ Step failed with exit code ${code}.`);
         bg: UI_BG
       }
     });
-    const footer = blessed.box({
+    const footer = import_neo_blessed.default.box({
       parent: root,
       bottom: 0,
       left: 0,

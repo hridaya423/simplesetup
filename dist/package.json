@@ -1,12 +1,12 @@
 {
   "name": "simplesetup",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "simplesetup": "cli.cjs"
   },
   "pkg": {
     "assets": [
-      "node_modules/neo-blessed/**/*"
+      "../node_modules/neo-blessed/**/*"
     ],
     "targets": [
       "node20-macos-arm64",

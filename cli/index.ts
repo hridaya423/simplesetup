@@ -3,10 +3,10 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type * as Blessed from "blessed";
+import blessed from "neo-blessed";
 import {
   buildOpenClawApplyCommand,
   buildOpenClawExecutionPlan,
@@ -14,9 +14,6 @@ import {
   type OpenClawExecutionStep,
   type OpenClawWizardState,
 } from "./openclaw-domain.ts";
-
-const require = createRequire(import.meta.url);
-const blessed = require("neo-blessed") as typeof Blessed;
 
 type ToolOption = {
   id: string;
