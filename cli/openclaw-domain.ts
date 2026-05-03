@@ -249,13 +249,11 @@ export interface OpenClawWizardState {
   setupTrack: "local-laptop" | "remote-connect";
   authGuidance:
     | "auto"
-    | "openai-codex"
     | "openai-key"
     | "anthropic-key"
     | "openrouter-key"
     | "xai-key"
-    | "ollama-local"
-    | "skip";
+    | "ollama-local";
   installDaemon: boolean;
   remoteUrl: string;
   providerApiKey: string;
@@ -301,7 +299,7 @@ export function createDefaultState(): OpenClawWizardState {
     adminEmail: "admin@example.com",
     adminPasswordEnvConfirmed: false,
     setupTrack: "local-laptop",
-    authGuidance: "skip",
+    authGuidance: "openai-key",
     installDaemon: true,
     remoteUrl: "wss://gateway-host:18789",
     providerApiKey: "",
@@ -357,9 +355,7 @@ export function buildOpenClawApplyCommand(state: OpenClawWizardState): string {
   parts.push("--gateway-port", "18789", "--gateway-bind", "loopback");
   parts.push("--secret-input-mode", "ref");
 
-  if (state.authGuidance === "openai-codex") {
-    parts.push("--auth-choice", "openai-codex");
-  } else if (state.authGuidance === "openai-key") {
+  if (state.authGuidance === "openai-key") {
     parts.push("--auth-choice", "openai-api-key");
   } else if (state.authGuidance === "anthropic-key") {
     parts.push("--auth-choice", "apiKey");
@@ -370,7 +366,7 @@ export function buildOpenClawApplyCommand(state: OpenClawWizardState): string {
   } else if (state.authGuidance === "ollama-local") {
     parts.push("--auth-choice", "ollama");
   } else {
-    parts.push("--auth-choice", "skip");
+    parts.push("--auth-choice", "openai-api-key");
   }
 
   if (state.installDaemon) {

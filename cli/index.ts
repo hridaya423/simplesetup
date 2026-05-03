@@ -794,18 +794,16 @@ class SimpleSetupTui {
         title: "Auth provider",
         subtitle: "Choose how onboarding should configure model authentication.",
         options: () => [
-          { label: "OpenAI Codex subscription", value: "openai-codex", hint: "Uses --auth-choice openai-codex" },
           { label: "OpenAI API key", value: "openai-key", hint: "Uses --auth-choice openai-api-key" },
           { label: "Anthropic API key", value: "anthropic-key", hint: "Uses --auth-choice apiKey" },
           { label: "OpenRouter API key", value: "openrouter-key", hint: "Uses --auth-choice openrouter-api-key" },
           { label: "xAI API key", value: "xai-key", hint: "Uses --auth-choice xai-api-key" },
           { label: "Local Ollama", value: "ollama-local", hint: "Uses --auth-choice ollama" },
-          { label: "Skip auth for now", value: "skip", hint: "Onboard first, configure model auth later" },
         ],
         currentIndex: (state, options) => options.findIndex((item) => item.value === state.authGuidance),
         apply: (state, value) => {
           state.authGuidance = value as OpenClawWizardState["authGuidance"];
-          if (["openai-codex", "ollama-local", "skip", "auto"].includes(state.authGuidance)) {
+          if (["ollama-local", "auto"].includes(state.authGuidance)) {
             state.providerApiKey = "";
           }
         },
